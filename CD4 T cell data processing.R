@@ -28,7 +28,6 @@ library(tibble)
 #additional files required:
 #Combined.CD4.rds generated from pre-processing scripts
 #CD4.total.rds generated from pre-processing scripts
-#igblast_final_all.tsv
 #TCRB_shared_clone5copy.txt (for both CD4 and CD8 T cells)
 
 #merge CD4 T cells from whole gut samples and CD3 isolated samples####
@@ -243,58 +242,7 @@ CD4.clean <-RenameIdents(CD4.clean, 'B008A' = 'infected', 'B008B' = 'infected', 
 CD4.clean$Condition <- Idents(CD4.clean)
 table(CD4.clean$Condition)
 
-#add TCR####
-trek <- read.table("~/igblast_final_all.tsv")
-colnames(trek) <- c("chain", "V_call", "D_call", "J_call", "cdr3", "cdr3_aa", "junction", "junction_aa", "BC", "UMI")
-trek <- trek[c(1,2,3,4,7,8,9,10)]
-
-AddTCR<-function(SeuratObj, Annotationfile, minimal=FALSE){
-  Annotation<-Annotationfile
-  #need to filter the annotation file, first split into A and B
-  AnnotationA <- Annotation[Annotation$chain == "TRA",]
-  AnnotationB <- Annotation[Annotation$chain == "TRB",]
-  
-  #pick the one with the most UMIs
-  AnnotationA<-group_by(AnnotationA, BC) %>% slice_max(order_by = count_duplicate_Junction_perBC, with_ties = FALSE, n=1)
-  AnnotationB<-group_by(AnnotationB, BC) %>% slice_max(order_by = count_duplicate_Junction_perBC, with_ties = FALSE, n=1)
-  
-  #rename the columns so they can be merged
-  colnames(AnnotationA)<-paste("A", colnames(AnnotationA), sep = "_")
-  colnames(AnnotationB)<-paste("B", colnames(AnnotationB), sep = "_")
-  
-  Annotation<-merge(AnnotationA, AnnotationB, by.x="A_BC",by.y="B_BC", all=TRUE)
-  rownames(Annotation)<-Annotation$A_BC
-  if(minimal){
-    Annotation<-Annotation[,c("B_cdr3_nt", "B_v_gene","B_j_gene","B_d_gene", "B_cdr3",
-                              "A_cdr3_nt","A_v_gene","A_j_gene","A_d_gene", "A_cdr3")]
-  }
-  SeuratObj<-AddMetaData(SeuratObj, metadata = Annotation)
-  return(SeuratObj)
-}
-
-trek$BC_UMI <- paste(trek$BC, trek$UMI, sep = "_")
-trek_dedup_by_BC_UMI <- group_by(trek, chain, V_call, D_call, J_call, BC, BC_UMI, junction) %>% summarise(count =n()) %>% mutate(total = sum(count)) %>% mutate(freq = count/total)
-trek_dedup_by_BC_UMI$BC_junction <- paste(trek_dedup_by_BC_UMI$BC, trek_dedup_by_BC_UMI$junction, sep = "_")
-colnames(trek_dedup_by_BC_UMI) <- c("chain", "V_call", "D_call", "J_call", "BC", "BC_UMI", "junction", "count_junction_for_BC_UMI", "totalcount_junction_for_BC_UMI", "freq_junction_for_BC_UMI", "BC_junction")
-
-#5 TCR copies per UMI
-trek_dedup_by_BC_UMI_5copy <- subset(trek_dedup_by_BC_UMI, trek_dedup_by_BC_UMI[8] > 4)
-#get count of UMIs with same junction (code only work after above, which deduplicates by BC_UMI, so that each entry is unique by UMI and junction)
-trek_dedup_by_BC_UMI_5copy <- trek_dedup_by_BC_UMI_5copy %>% group_by(BC, junction) %>% mutate(count_duplicate_Junction_perBC = n())
-#"count" give us total number of junction duplicates in one barcode (can be multiple UMI having same junction 'count_duplicate_Junction_perBC') (e.g., 1, 1, 2, 1, 1 = 6)
-trek_dedup_by_BC_UMI_5copy1 <- trek_dedup_by_BC_UMI_5copy %>% group_by(BC_junction) %>% summarise(count = sum(count_junction_for_BC_UMI))
-trek_dedup_by_BC_UMI_5copy <- merge(trek_dedup_by_BC_UMI_5copy, trek_dedup_by_BC_UMI_5copy1, by = "BC_junction")
-
-CD4.clean$BC <- colnames(CD4.clean); Idents(CD4.clean) <- "BC"
-CD4.clean.5copy <- AddTCR(CD4.clean, trek_dedup_by_BC_UMI_5copy)
-metadata <- CD4.clean.5copy@meta.data
-metadata$BC <- rownames(metadata)
-metadata_TCRB <- metadata[!is.na(metadata$B_junction),]
-metadata_TCRA <- metadata[!is.na(metadata$A_junction),]
-
-#processed shared clone barcodes: TCRB_shared_clone5copy.txt
-#TCRB_shared_clone5copy.txt was generated from metadata_TCRB, with atleast 2 cell barcodes sharing the same TCRB CDR3 sequences called as the same clone and labeled with the same unique clone IDs.
-
+#add clones####
 TCRB_shared_clone <- read.table(file = "~/TCRB_shared_clone5copy.txt", header = TRUE)
 TCRB_shared_clone$is.TCR <- "TCRB"
 
