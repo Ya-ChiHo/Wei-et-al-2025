@@ -1,5 +1,5 @@
 #Figure 2A
-#require objects from CD8 T gut data preprocessing.R
+#require objects from CD8 T cell data processing.R
 DimPlot(CD8.clean, reduction = "umap.wnn", group.by = "major_celltype", label = TRUE, label.size = 4, raster=FALSE)
 
 #Figure 2C
