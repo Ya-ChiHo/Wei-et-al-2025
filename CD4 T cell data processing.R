@@ -28,7 +28,7 @@ library(tibble)
 #additional files required:
 #Combined.CD4.rds generated from pre-processing scripts
 #CD4.total.rds generated from pre-processing scripts
-#TCRB_shared_clone5copy.txt (for both CD4 and CD8 T cells)
+#CD4_TCRB_shared_clone5copy.txt (for both CD4 and CD8 T cells)
 
 #merge CD4 T cells from whole gut samples and CD3 isolated samples####
 CD4.CD3 <- CreateSeuratObject(counts = Combined.CD4[["RNA"]]$counts, assay =  "RNA")
@@ -243,7 +243,7 @@ CD4.clean$Condition <- Idents(CD4.clean)
 table(CD4.clean$Condition)
 
 #add clones####
-TCRB_shared_clone <- read.table(file = "~/TCRB_shared_clone5copy.txt", header = TRUE)
+TCRB_shared_clone <- read.table(file = "~/CD4_TCRB_shared_clone5copy.txt", header = TRUE)
 TCRB_shared_clone$is.TCR <- "TCRB"
 
 CD4.clean$is.clone <- ifelse(colnames(CD4.clean) %in% TCRB_shared_clone$BC, 
