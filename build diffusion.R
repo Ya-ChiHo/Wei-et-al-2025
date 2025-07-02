@@ -45,31 +45,17 @@ TRM.Th1.infected$BACH2_activity <- q.infected$BACH2_activity
 #bin cells ordered by BACH2 into groups####
 #repeat for cells in TRM.Th1.uninfected, TRM.CD8.infected, TRM.CD8.uninfected
 
-#bin cells into 20 groups by BACH2 activity
-TRM.Th1.infected$BACH2_bin20 <- cut(TRM.Th1.infected$BACH2_activity, 20)
-
-Idents(TRM.Th1.infected) <- "BACH2_bin20"
-table(TRM.Th1.infected$BACH2_bin20)
+#bin cells into 10 groups by BACH2 activity
+TRM.Th1.infected$BACH2_bin10 <- cut(TRM.Th1.infected$BACH2_activity, 10)
 
 #make the groups somewhat equal in cell size
-TRM.Th1.infected$BACH2_bin <- TRM.Th1.infected$BACH2_bin20
-Idents(TRM.Th1.infected) <- "BACH2_bin"
-TRM.Th1.infected <-RenameIdents(TRM.Th1.infected, '(-8.01,-7.2]' = '(-8.01,-3.23]', '(-7.2,-6.41]' = '(-8.01,-3.23]',
-                                '(-6.41,-5.61]' = '(-8.01,-3.23]', '(-5.61,-4.82]' = '(-8.01,-3.23]', 
-                                '(-4.82,-4.03]' = '(-8.01,-3.23]', '(-4.03,-3.23]' = '(-8.01,-3.23]',
-                                '(-3.23,-2.44]' = '(-3.23,-1.64]', '(-2.44,-1.64]' = '(-3.23,-1.64]',
-                                '(-1.64,-0.851]' = '(-1.64,0.737]', '(-0.851,-0.0569]' = '(-1.64,0.737]', '(-0.0569,0.737]' = '(-1.64,0.737]',
-                                '(3.12,3.91]' = '(2.32,7.9]', '(2.32,3.12]' = '(2.32,7.9]',
-                                '(3.91,4.71]' = '(2.32,7.9]', '(4.71,5.5]' = '(2.32,7.9]', '(5.5,6.29]' = '(2.32,7.9]',
-                                '(6.29,7.09]' = '(2.32,7.9]', '(7.09,7.9]' = '(2.32,7.9]')
-TRM.Th1.infected$BACH2_bin <- Idents(TRM.Th1.infected)
-
+Idents(TRM.Th1.infected) <- "BACH2_bin10"
 TRM.Th1.infected.downsample <- subset(x = TRM.Th1.infected, downsample = 800)
 
 #identify differential expressed genes (RNA) for each bin####
 #repeat for cells in TRM.Th1.uninfected, TRM.CD8.infected, TRM.CD8.uninfected
 
-DefaultAssay(TRM.Th1.infected.downsample) <- "RNA.clean"; Idents(TRM.Th1.infected.downsample) <- "BACH2_bin"
+DefaultAssay(TRM.Th1.infected.downsample) <- "RNA.clean"; Idents(TRM.Th1.infected.downsample) <- "BACH2_bin10"
 TRM.Th1.infected.bin.RNA  <- FindAllMarkers(TRM.Th1.infected.downsample, 
                                             only.pos = TRUE, min.pct = 0.1,
                                             logfc.threshold = 0.5)
