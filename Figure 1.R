@@ -1,6 +1,6 @@
 #Figure 1A
 #require objects from whole gut data preprocessing.R
-DimPlot(Total.ATAC.integrated, reduction = "umap.wnn", group.by = "major_celltype", label = TRUE, label.size = 4, raster=FALSE)
+DimPlot(CD4.clean, reduction = "umap.wnn", group.by = "major_celltype", label = TRUE, label.size = 4, raster=FALSE)
 
 #Figure 1C
 #require objects from CD4 T cell data processing.R
