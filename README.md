@@ -23,7 +23,7 @@ build cell cell communication.R - minimal example scripts to build required R ob
 
 All scripts in the 'Figures.R' require processed Seurat objects generated from either 'CD4 T cell data processing.R' or 'CD8 T cell data processing.R' and R objects generated from the 'build ---.R' scripts. Scripts in 'Figures' generate the plots as shown in manuscript main figures and, when relevant, the functions/data processing steps required to generate these plots. Scripts in 'Figures.R' may be modified to reproduce all supplemental figures. If there are particular aspects of the analyses you would like to see that are not here, or have any other questions, please email Yulong.Wei@yale.edu or Ya-Chi.Ho@yale.edu.
 
-Raw reads and processed data (e.g., cellranger filtered feature bc matrices, hashtag keys, fragment.tsv etc.) are hosted on GEO:GSE299348 
+Raw reads and processed data (e.g., cellranger filtered feature bc matrices, hashtag keys, fragment.tsv etc.) are hosted on GEO:GSE299348.
 For all other required processed data (e.g., HIV+ cell barcodes, TCR igblast results, cell barcode and clonotype) see this repository and the supplemental files in the associated manuscript.
 
 Comment on Seurat v5 and Signac for Seurat v5 (2025-07-01): Note that some functions have been removed/replaced, while default parameters changed in others (e.g., FIndMarkers), and data structure different (e.g., layers), in Seurat v5 vs Seurat v4. Version difference may lead to some scripts breaking and may lead to slight graphical differences (e.g., volcanoplot because of change in FC in FindMarkers), but do not otherwise affect the main results (e.g., key differentially expressed genes).
